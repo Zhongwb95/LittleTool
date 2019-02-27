@@ -29,7 +29,7 @@ def make_zip(source_dir, output_filename, keys):
 
 if __name__ == '__main__':
     """ 使用方法 ：
-    python package.py path : path为要查找文件夹的路径
+    python find_and_package.py path : path为要查找文件夹的路径
     """
     if len(sys.argv)>1 and os.path.isdir(sys.argv[1]):
         make_zip(sys.argv[1], 'SConscript.zip', ['SConscript', 'SConstruct'])
