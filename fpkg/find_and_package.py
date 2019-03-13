@@ -35,7 +35,12 @@ if __name__ == '__main__':
     """ 使用方法 ：
     python package.py path : path为要查找文件夹的路径
     """
-    if len(sys.argv)>1 and os.path.isdir(sys.argv[1]):
-        make_zip(src_dir=sys.argv[1], keys=['SConscript', 'SConstruct'])
+    if len(sys.argv)>1: 
+        src_dir = sys.argv[1]
+        if os.path.isdir(src_dir):
+            make_zip(src_dir=src_dir, keys=['SConscript', 'SConstruct'])
+        else:
+            print('No such directory: %' % src_dir)
     else:
-        print('no dir to zip %s' % os.path.sep)
+        print('Not enough arguments')
+
