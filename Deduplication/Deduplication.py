@@ -6,4 +6,4 @@ class Tool:
     """
     对列表中的元素去重 （python3 有效）
     """
-        retrun list(set(obj_list))
+        return list(set(obj_list))
