@@ -68,3 +68,22 @@ def remove_note(file, single='//', pre='/*', fix='*/'):
         rf.writelines('\n'.join(new_lines))
     return re_file
 
+def isUtf8(file):
+"""
+判断文件是不是以utf-8编码
+"""
+    with open(file, "rb") as f:
+        byte = 1
+        while byte:
+            byte = f.read(1)
+            if byte:
+                data = '{:08b}'.format(ord(byte))
+                b = data.find('0')	    
+                if b==0:
+                    continue
+                if abs(b)==1:
+                    return False
+                for _ in range(b-1):
+                    if ord(f.read(1))&0xc0!=0x80:
+                        return False
+    return True
