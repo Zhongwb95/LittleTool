@@ -46,8 +46,7 @@ def remove_note(file, single='//', pre='/*', suf='*/'):
     single = make_do(single)
     pre = make_do(pre)
     suf = make_do(suf)
-    re_line = f'{single}{pre}{suf}'
-    new_lines = ''
+    re_line = f'({single}.*?\n)|({pre}[\s\S]*?{suf})'
     with open(file, 'rt') as sf:
         new_lines = re.sub(re_line, '', sf.read())
     filename = os.path.splitext(file)
