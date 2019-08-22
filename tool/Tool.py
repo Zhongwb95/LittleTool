@@ -1,5 +1,6 @@
 
 import os
+import re
 
 def Deduplication(obj_list):
 """
@@ -30,43 +31,30 @@ def make_triangle(x):
     return Y_triangle
 
 
-def remove_note(file, single='//', pre='/*', fix='*/'):
+def remove_note(file, single='//', pre='/*', suf='*/'):
 """
 将文件中的注释处理掉,返回没有注释的文件名
 """
-    new_lines = []
-    flag = False
-    with open(file, ) as sf:
-        for line in sf:
-            index_ll = line.find(single)
-            index_le = line.find(pre)
-            index_el = line.find(fix)
-            if index_ll == index_le and not flag:
-                new_lines.append(line.strip())
-                continue
-            new_line = ''
-            if index_le != -1 and index_ll != -1:
-                min_index = min([index_le, index_ll])
-                new_line = line[:min_index]
-                if min_index == index_le:
-                    flag = True
-                else:
-                    new_lines.append(new_line.strip())
-                    continue
-            if index_ll != -1 and not flag:
-                new_line = line[:index_ll]
-            if index_le != -1 and not flag:
-                new_line = line[:index_le]
-                flag = True
-            if flag and index_el != -1:
-                flag = False
-                new_line += line[index_el+2:]
-            new_lines.append(new_line.strip())
+    def make_do(s_str):
+        r_str = ''
+        for ch in s_str:
+            dc = ''
+            if ch in ['*.\\+%[](){}?^|']:
+                dc = '\\'
+            r_str += dc + ch
+        return r_str
+    single = make_do(single)
+    pre = make_do(pre)
+    suf = make_do(suf)
+    re_line = f'{single}{pre}{suf}'
+    new_lines = ''
+    with open(file, 'rt') as sf:
+        new_lines = re.sub(re_line, '', sf.read())
     filename = os.path.splitext(file)
-    re_file = '%s_unote%s'%(filename[0], filename[-1])
-    with open(re_file, mode='w', encoding='utf-8') as rf:
-        rf.writelines('\n'.join(new_lines))
-    return re_file
+    out_file = '%s_unote%s'%(filename[0], filename[-1])
+    with open(out_file, mode='w', encoding='utf-8') as rf:
+        rf.writelines(new_lines)
+    return out_file
 
 def isUtf8(file):
 """
