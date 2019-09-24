@@ -1,12 +1,67 @@
 
 import os
 import re
+import random
 
-def Deduplication(obj_list):
+class Password(object):
 """
-对列表中的元素去重 （python3 有效）
+根据需求生成随机字符串(可用来产生随机密码)
+使用方法:
+    # 第一个参数为随机字符串长度,0为8到32随机长度; 
+    # 第二个参数为字符串组成成分,如:{'d':digits, 'l':line, 'u':upper, 's':special, 'o':lower}
+    password = Password(8, 'udlo') 
+    print(password())
+    # 未进行输入校验,若第二个参数长度(类型总数)大于随机字符串长度或输入不存在类型会抛出异常
 """
-    return list(set(obj_list))
+    lower = 'abcdefghijklmnopqrstuvwxyz'
+    upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+    digits = '0123456789'
+    line = '_'
+    special = '!@#$%^&*()+~.-=|\\?/;:><,[]{}"\'`'
+    dict = {'d':digits, 'l':line, 'u':upper, 's':special, 'o':lower}
+
+    def __init__(self, length, types='unl'):
+        if self.checkInput(length, types): raise Exception
+        self.length = length
+        self.types = types
+        self.characters = ''
+        self.password = ''
+
+    def checkInput(self, length, types):
+        types = list(set(list(types)))
+        keys = self.dict.keys()
+        if len(types) > length:
+            return True
+        return sum([0 if _ in keys else 1 for _ in types])
+
+    def getRandomChar(self):
+        return self.characters[random.randint(0, len(self.characters)-1)]
+
+    def setPasswordBase(self):
+        if not self.length or self.length == 'random':
+            self.length = random.randint(8,32)
+        for tp in self.types:
+            self.characters += self.dict.get(tp, '')
+
+    def checkPassword(self):
+        fl = self.dict.copy()
+        for i,v in fl.items():
+            fl[i] = 0
+            for ch in v:
+                if ch in self.password: fl[i] = 1
+        if sum(fl.values()) == len(self.types):
+            return True
+
+    def getRandomPassword(self):
+        self.setPasswordBase()
+        while not self.checkPassword():
+            self.password = ''
+            for i in range(self.length):
+                self.password += self.getRandomChar()
+
+    def __call__(self):
+        self.getRandomPassword()
+        return self.password  
 
 
 def make_triangle(x):
@@ -54,6 +109,7 @@ def remove_note(file, single='//', pre='/*', suf='*/'):
     with open(out_file, mode='w', encoding='utf-8') as rf:
         rf.writelines(new_lines)
     return out_file
+
 
 def isUtf8(file):
 """
