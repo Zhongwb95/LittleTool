@@ -1,4 +1,3 @@
-
 import os
 import re
 import random
@@ -22,7 +21,8 @@ class Password(object):
     dict = {'d': digits, 'l': line, 'u': upper, 's': special, 'o': lower}
 
     def __init__(self, length, types='unl'):
-        if self.check_input(length, types): raise Exception
+        if self.check_input(length, types):
+            raise Exception
         self.length = length
         self.types = types
         self.characters = ''
@@ -46,10 +46,11 @@ class Password(object):
 
     def check_password(self):
         fl = self.dict.copy()
-        for i,v in fl.items():
+        for i, v in fl.items():
             fl[i] = 0
             for ch in v:
-                if ch in self.password: fl[i] = 1
+                if ch in self.password:
+                    fl[i] = 1
         if sum(fl.values()) == len(self.types):
             return True
 
@@ -106,7 +107,7 @@ def remove_note(file, single='//', pre='/*', suf='*/'):
     with open(file, 'rt') as sf:
         new_lines = re.sub(re_line, '', sf.read())
     filename = os.path.splitext(file)
-    out_file = f'{filename[0]}_unote{filename[-1]})'
+    out_file = f'{filename[0]}_note{filename[-1]})'
     with open(out_file, mode='w', encoding='utf-8') as rf:
         rf.writelines(new_lines)
     return out_file
