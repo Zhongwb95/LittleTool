@@ -21,6 +21,8 @@ class Password(object):
     dict = {'d': digits, 'l': line, 'u': upper, 's': special, 'o': lower}
 
     def __init__(self, length, types='oudl'):
+        if not length or length == 'random':
+            length = random.randint(8, 32)
         if self.check_input(length, types):
             raise Exception
         self.length = length
@@ -39,8 +41,6 @@ class Password(object):
         return self.characters[random.randint(0, len(self.characters)-1)]
 
     def set_password_base(self):
-        if not self.length or self.length == 'random':
-            self.length = random.randint(8, 32)
         for tp in self.types:
             self.characters += self.dict.get(tp, '')
 
