@@ -1,6 +1,7 @@
 import os
 import re
 import random
+import string
 
 
 class Password(object):
@@ -13,9 +14,9 @@ class Password(object):
     print(password())
     # 未进行输入校验,若第二个参数长度(类型总数)大于随机字符串长度或输入不存在类型会抛出异常
     """
-    lower = 'abcdefghijklmnopqrstuvwxyz'
-    upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
-    digits = '0123456789'
+    lower = string.ascii_lowercase
+    upper = string.ascii_uppercase
+    digits = string.digits
     line = '_'
     special = '!@#$%^&*()+~.-=|\\?/;:><,[]{}"\'`'
     dict = {'d': digits, 'l': line, 'u': upper, 's': special, 'o': lower}
