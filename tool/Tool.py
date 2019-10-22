@@ -20,7 +20,7 @@ class Password(object):
     special = '!@#$%^&*()+~.-=|\\?/;:><,[]{}"\'`'
     dict = {'d': digits, 'l': line, 'u': upper, 's': special, 'o': lower}
 
-    def __init__(self, length, types='unl'):
+    def __init__(self, length, types='oudl'):
         if self.check_input(length, types):
             raise Exception
         self.length = length
