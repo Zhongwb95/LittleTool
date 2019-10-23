@@ -22,29 +22,80 @@ class Constraint(object):
     def add_cell(self, cell):
         self.cells.append(cell)
 
+    def get_cells(self):
+        return self.cells
+
 
 class Cell(object):
-    able_num = []
-
     def __init__(self, row, col, layer):
         self.row = row
         self.col = col
         self.layer = layer
+        self.limits = [row, col, layer]
+        self.able_num = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        self.value = 0
+
+    def check_self(self):
+        if self.able_num and len(self.able_num) == 1:
+            self.set_value(self.able_num[0])
+
+    def get_value(self):
+        return self.value
+
+    def set_value(self, value):
+        self.value = value
+        if value:
+            self.able_num = []
+            self.set_cells_able_num()
+
+    def set_cells_able_num(self):
+        for limit in self.limits:
+            for cell in limit.get_cells():
+                if self.value in cell.able_num:
+                    cell.able_num.remove(self.value)
+
+    def set_able_num(self):
+        if not self.value:
+            for limit in self.limits:
+                for cell in limit.get_cells():
+                    if cell == self:
+                        continue
+                    if cell.get_value() in self.able_num:
+                        self.able_num.remove(cell.get_value())
+        print(self)
+
+    def __str__(self):
+        return f'({self.row.value},{self.col.value}) {self.value} {self.able_num}'
 
 
 class Layer(Constraint):
     def __init__(self, value):
         Constraint.__init__(self, value)
 
+    def __str__(self):
+        out_str = ''
+        for i in range(len(self.cells)):
+            if (i + 1) % 3:
+                out_str += f'{self.cells[i].get_value()}  '
+            else:
+                out_str += f'{self.cells[i].get_value()}\n'
+        return out_str.strip()
+
 
 class Row(Constraint):
     def __init__(self, value):
         Constraint.__init__(self, value)
 
+    def __str__(self):
+        return '  '.join([str(cell.get_value()) for cell in self.cells])
+
 
 class Column(Constraint):
     def __init__(self, value):
         Constraint.__init__(self, value)
+
+    def __str__(self):
+        return '\n'.join([str(cell.get_value()) for cell in self.cells])
 
 
 class Sudoku(object):
@@ -60,7 +111,8 @@ class Sudoku(object):
 
     def _init_number(self, input_num):
         for cell in self.cell_list:
-            cell.value = input_num[cell.row.value][cell.col.value]
+            value = input_num[cell.row.value][cell.col.value]
+            cell.set_value(value)
 
     def _init_constraint(self):
         for i in range(9):
@@ -86,3 +138,6 @@ class Sudoku(object):
             if isinstance(layer_map[0], list):
                 value += layer_map[row][col]
         return self.layers[value]
+
+    def __str__(self):
+        return '\n'.join([str(row) for row in self.rows])

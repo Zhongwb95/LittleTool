@@ -12,5 +12,5 @@ if __name__ == '__main__':
     byte = m.digest()
     new_string = ''
     for b in byte:
-        new_string += lib_char[int(b)%len(lib_char)]
+        new_string += lib_char[int(b) % len(lib_char)]
     print(new_string)
