@@ -25,6 +25,12 @@ class Constraint(object):
     def get_cells(self):
         return self.cells
 
+    def check_ok(self):
+        finish = 1
+        for cell in self.cells:
+            finish *= cell.get_value()
+        return 1 if finish == 362880 else 0
+
 
 class Cell(object):
     def __init__(self, row, col, layer):
@@ -66,6 +72,10 @@ class Cell(object):
 
     def __str__(self):
         return f'({self.row.value},{self.col.value}) {self.value} {self.able_num}'
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            return self.get_value() == other.get_value()
 
 
 class Layer(Constraint):
@@ -139,5 +149,22 @@ class Sudoku(object):
                 value += layer_map[row][col]
         return self.layers[value]
 
+    def check_ok(self):
+        finish = 1
+        for row in self.rows:
+            finish *= row.check_ok()
+        for col in self.cols:
+            finish *= col.check_ok()
+        for layer in self.layers:
+            finish *= layer.check_ok()
+        return True if finish else False
+
     def __str__(self):
         return '\n'.join([str(row) for row in self.rows])
+
+    def __eq__(self, other):
+        if type(other) == type(self):
+            t = 1
+            for i in range(81):
+                t *= self.cell_list[i] == other.cell_list[i]
+            return True if t else False
