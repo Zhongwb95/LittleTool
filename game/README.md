@@ -4,6 +4,9 @@
 
 ## 数独解题实现（普通）
 
+运行方式见demo/sudoku_test.py
+输入格式见game/sudoku_puzzles.py
+
 ### 规则
 ```text
 将数字1至9填入空格中,使得每个数字在每行/每列/每宫中各出现一次。
