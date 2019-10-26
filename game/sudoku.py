@@ -17,6 +17,7 @@ class Constraint(object):
 
     def __init__(self, value):
         self.value = value
+        self.unused_numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         self.cells = []
 
     def add_cell(self, cell):
@@ -25,11 +26,20 @@ class Constraint(object):
     def get_cells(self):
         return self.cells
 
-    def check_ok(self):
+    def finish_check(self):
         finish = 1
         for cell in self.cells:
             finish *= cell.get_value()
         return 1 if finish == 362880 else 0
+
+    def check_self(self):
+        for num in self.unused_numbers:
+            tmp = []
+            for cell in self.cells:
+                if num in cell.able_num:
+                    tmp.append(cell)
+            if len(tmp) == 1:
+                tmp[0].set_value(num)
 
 
 class Cell(object):
@@ -37,7 +47,7 @@ class Cell(object):
         self.row = row
         self.col = col
         self.layer = layer
-        self.limits = [row, col, layer]
+        self.constraints = [row, col, layer]
         self.able_num = [1, 2, 3, 4, 5, 6, 7, 8, 9]
         self.value = 0
 
@@ -55,15 +65,17 @@ class Cell(object):
             self.set_cells_able_num()
 
     def set_cells_able_num(self):
-        for limit in self.limits:
-            for cell in limit.get_cells():
+        for constraint in self.constraints:
+            if self.value in constraint.unused_numbers:
+                constraint.unused_numbers.remove(self.value)
+            for cell in constraint.get_cells():
                 if self.value in cell.able_num:
                     cell.able_num.remove(self.value)
 
     def set_able_num(self):
         if not self.value:
-            for limit in self.limits:
-                for cell in limit.get_cells():
+            for constraint in self.constraints:
+                for cell in constraint.get_cells():
                     if cell == self:
                         continue
                     if cell.get_value() in self.able_num:
@@ -76,6 +88,9 @@ class Cell(object):
     def __eq__(self, other):
         if type(other) == type(self):
             return self.get_value() == other.get_value()
+
+    def __hash__(self):
+        pass
 
 
 class Layer(Constraint):
@@ -109,12 +124,13 @@ class Column(Constraint):
 
 
 class Sudoku(object):
-    rows = []
-    cols = []
-    layers = []
-    cell_list = []
 
     def __init__(self, input_num):
+        self.rows = []
+        self.cols = []
+        self.layers = []
+        self.constraints_list = [self.rows, self.cols, self.layers]
+        self.cell_list = []
         self._init_constraint()
         self._init_cells()
         self._init_number(input_num)
@@ -149,14 +165,11 @@ class Sudoku(object):
                 value += layer_map[row][col]
         return self.layers[value]
 
-    def check_ok(self):
+    def finish_check(self):
         finish = 1
-        for row in self.rows:
-            finish *= row.check_ok()
-        for col in self.cols:
-            finish *= col.check_ok()
-        for layer in self.layers:
-            finish *= layer.check_ok()
+        for constraints in self.constraints_list:
+            for constraint in constraints:
+                finish *= constraint.finish_check()
         return True if finish else False
 
     def __str__(self):
@@ -168,6 +181,22 @@ class Sudoku(object):
             for i in range(81):
                 t *= self.cell_list[i] == other.cell_list[i]
             return True if t else False
+
+    def constraint_check(self):
+        for constraints in self.constraints_list:
+            for constraint in constraints:
+                constraint.check_self()
+
+    def routine_solution(self):
+        count = 0
+        while True:
+            count += 1
+            self.constraint_check()
+            if count == 80:
+                break
+            if self.finish_check():
+                break
+        print(count)
 
 
 def parse_theme(theme_str):
