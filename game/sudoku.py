@@ -190,7 +190,7 @@ class Sudoku(object):
         print(count)
 
 
-def parse_theme(theme_str):
+def parse_puzzle(theme_str):
     count = 0
     out = [[], [], [], [], [], [], [], [], []]
     if isinstance(theme_str, str) and len(theme_str) == 81:
