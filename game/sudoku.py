@@ -72,25 +72,12 @@ class Cell(object):
                 if self.value in cell.able_num:
                     cell.able_num.remove(self.value)
 
-    def set_able_num(self):
-        if not self.value:
-            for constraint in self.constraints:
-                for cell in constraint.get_cells():
-                    if cell == self:
-                        continue
-                    if cell.get_value() in self.able_num:
-                        self.able_num.remove(cell.get_value())
-        print(self)
-
     def __str__(self):
         return f'({self.row.value},{self.col.value}) {self.value} {self.able_num}'
 
     def __eq__(self, other):
         if type(other) == type(self):
             return self.get_value() == other.get_value()
-
-    def __hash__(self):
-        pass
 
 
 class Layer(Constraint):
@@ -182,16 +169,20 @@ class Sudoku(object):
                 t *= self.cell_list[i] == other.cell_list[i]
             return True if t else False
 
-    def constraint_check(self):
+    def constraints_check(self):
         for constraints in self.constraints_list:
             for constraint in constraints:
                 constraint.check_self()
 
-    def routine_solution(self):
+    def cells_check(self):
+        for cell in self.cell_list:
+            cell.check_self()
+
+    def routine_solution(self):  # TODO 两种解法混合解题
         count = 0
         while True:
             count += 1
-            self.constraint_check()
+            self.constraints_check()
             if count == 80:
                 break
             if self.finish_check():
@@ -202,10 +193,10 @@ class Sudoku(object):
 def parse_theme(theme_str):
     count = 0
     out = [[], [], [], [], [], [], [], [], []]
-    if isinstance(theme_str, str) and len(theme_str) != 81:
-        raise Exception(f'input error {theme_str}')
-    else:
+    if isinstance(theme_str, str) and len(theme_str) == 81:
         for num in theme_str:
             out[int(count/9)].append(int(num))
             count += 1
+    else:
+        raise Exception(f'input error {theme_str}')
     return out

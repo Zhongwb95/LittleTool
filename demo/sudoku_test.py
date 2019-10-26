@@ -1,7 +1,7 @@
 import time
 
 from game.sudoku import *
-from game.sudoku_themes import *
+from game.sudoku_puzzles import *
 
 
 if __name__ == '__main__':
