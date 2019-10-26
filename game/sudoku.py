@@ -49,8 +49,8 @@ class Cell(object):
         return self.value
 
     def set_value(self, value):
-        self.value = value
         if value:
+            self.value = value
             self.able_num = []
             self.set_cells_able_num()
 
@@ -168,3 +168,15 @@ class Sudoku(object):
             for i in range(81):
                 t *= self.cell_list[i] == other.cell_list[i]
             return True if t else False
+
+
+def parse_theme(theme_str):
+    count = 0
+    out = [[], [], [], [], [], [], [], [], []]
+    if isinstance(theme_str, str) and len(theme_str) != 81:
+        raise Exception(f'input error {theme_str}')
+    else:
+        for num in theme_str:
+            out[int(count/9)].append(int(num))
+            count += 1
+    return out
