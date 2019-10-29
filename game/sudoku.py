@@ -1,3 +1,12 @@
+#!/usr/bin/python3
+# -*- encoding: utf-8 -*-
+# @File    : eq_demo.py
+# @Time    : 2019/10/29 19:19
+# @Author  : 年少少年
+# @Email   : 799571200@qq.com
+
+
+import copy
 
 
 def normal_sudoku(row, col):
@@ -77,7 +86,7 @@ class Cell(object):
 
     def __eq__(self, other):
         if type(other) == type(self):
-            return self.get_value() == other.get_value()
+            return self.value == other.value and self.able_num == other.able_num
 
 
 class Layer(Constraint):
@@ -178,16 +187,32 @@ class Sudoku(object):
         for cell in self.cell_list:
             cell.check_self()
 
-    def routine_solution(self):  # TODO 两种解法混合解题
-        count = 0
-        while True:
+    def recursion_solution(self):
+        # TODO 递归解题，又名暴力解题。等想实现再说吧
+        pass
+
+    def routine_solution(self):
+        count = 0  # 统计进行了多少次解题（一次就是进行一次检查）
+        flag = 1  # 一种方法解不了换另一种
+        sc = 2  # 用于,解不了就早点退出
+        while not self.finish_check():
             count += 1
-            self.constraints_check()
-            if count == 80:
-                break
-            if self.finish_check():
-                break
-        print(count)
+            sc -= 1
+            last_cells = copy.deepcopy(self.cell_list)
+            # 解题方法控制
+            if flag + 1:
+                self.constraints_check()
+            else:
+                self.cells_check()
+            # 解题退出控制
+            if last_cells == self.cell_list:
+                flag *= -1
+            else:
+                sc = 2
+            if not sc:
+                return False, count
+        else:
+            return True, count
 
 
 def parse_puzzle(theme_str):
