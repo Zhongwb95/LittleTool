@@ -1,15 +1,7 @@
 import hashlib
 import os
-import random
 
-WA = 'm'
-TA = 's'
-TO = 'p'
-ZI = 'z'
-sampo_ps = '5z4s6m0p4m5m5s8m3s2s6s8s6p7m4m1m9m9m7m2z3m5z9p7s3z4p9s7s3p4p8p1s7m2s' \
-           '6p3z3s8s3z3s1s1s6z6p6m1p0s1p2z6m4z7s3z4z8s6z2s5m1m2p3p7z9m2p9s3s2m7m' \
-           '3p5s1p6p9p1z1s5p2p3m2m8p4m7z9p7z5z6s4s7s1m5s4s7p9p6s3m4z1z2m6z2m5z1p' \
-           '8p0m7p9m7z1z1m4z8s9s5m6s7p2z8m4p9s6m8m7p5p4s8p3p5p1z3m4m2z6z4p8m2s2p'
+from config import *
 
 
 def split_with_num(s_str, num=2):
@@ -21,6 +13,41 @@ def split_with_num(s_str, num=2):
 
 def get_ps_sha256(ps_str):
     return hashlib.sha256(ps_str.encode()).hexdigest()
+
+
+def str_to_zip_byte(ps_str) -> bytes:
+    zip_byte = bytes()
+    for tuple_str in split_with_num(ps_str, ZIP_PRE):
+        flag = True
+        t_num = 0
+        for ss in tuple_str:
+            if flag:
+                t_num = t_num << 4 | MAP_INT.index(ss)
+                flag = False
+            else:
+                t_num = t_num << 2 | MAP_TYPE.index(ss)
+                flag = True
+        zip_byte += int(t_num).to_bytes(ZIP_SUF, 'little')
+    return zip_byte
+
+
+def zip_byte_to_str(zip_byte) -> str:
+    ps_str = ''
+    for tuple_byte in split_with_num(zip_byte, ZIP_SUF):
+        t_num = int.from_bytes(tuple_byte, 'little')
+        ss = []
+        flag = False
+        for _ in range(ZIP_PRE):
+            if flag:
+                ss.insert(0, MAP_INT[0xf & t_num])
+                t_num = t_num >> 4
+                flag = False
+            else:
+                ss.insert(0, MAP_TYPE[0x3 & t_num])
+                t_num = t_num >> 2
+                flag = True
+        ps_str += ''.join(ss)
+    return ps_str
 
 
 def save_ps_str(info_root_path, ps_str, save_path=None) -> str:
@@ -36,19 +63,3 @@ def save_ps_str(info_root_path, ps_str, save_path=None) -> str:
 
 def read_ps_str(info_root_path, save_path) -> str:
     return open(os.path.join(info_root_path, save_path), 'r').read()
-
-
-def generate_ps_random(num=1) -> str:
-    ps = list(split_with_num(sampo_ps))
-    while num:
-        yield ''.join(random.sample(ps, len(ps)))
-        num -= 1
-
-
-def generate_and_save_ps(root_dir, num=1):
-    for ps in generate_ps_random(num):
-        save_ps_str(root_dir, ps)
-
-
-if __name__ == '__main__':
-    generate_and_save_ps(r'C:\Users\Administrator\OneDrive\游戏\quema_data', 10 ** 6)
