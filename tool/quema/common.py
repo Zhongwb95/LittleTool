@@ -11,8 +11,12 @@ def split_with_num(s_str, num=2):
         ss = ss[num:]
 
 
-def get_ps_sha256(ps_str):
+def get_sha256_hex(ps_str):
     return hashlib.sha256(ps_str.encode()).hexdigest()
+
+
+def get_sha256_dig(ps_str):
+    return hashlib.sha256(ps_str.encode()).digest()
 
 
 def str_to_zip_byte(ps_str) -> bytes:
@@ -52,7 +56,7 @@ def zip_byte_to_str(zip_byte) -> str:
 
 def save_ps_str(info_root_path, ps_str, save_path=None) -> str:
     if not save_path:
-        save_path = os.sep.join(split_with_num(get_ps_sha256(ps_str)))
+        save_path = os.sep.join(split_with_num(get_sha256_hex(ps_str)))
     file_abs_path = os.path.join(info_root_path, save_path)
     if os.path.isfile(file_abs_path):
         return save_path
